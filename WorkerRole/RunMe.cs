@@ -30,6 +30,7 @@ using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure.StorageClient;
 using SevenZip;
 using System.Xml;
+using System.Timers;
 
 
 namespace WorkerRole
@@ -46,6 +47,8 @@ namespace WorkerRole
         bool roleIsBusy = true;
 
         string approot;
+
+        System.Timers.Timer timer; 
 
         // Configuration setting keys
         const string TRACE_FORMAT = "TraceFormat";
@@ -70,6 +73,10 @@ namespace WorkerRole
         public RunMe()
         {
             log = new Log(RoleEnvironment.GetConfigurationSettingValue(LOG_CONNECTION_STRING));
+
+            timer = new System.Timers.Timer();
+            timer.Enabled = false;
+            timer.Elapsed += OnTimedEvent;
         }
 
         public static string GetAzureRunMeVersion()
@@ -154,11 +161,12 @@ namespace WorkerRole
                     diagnosticMonitorConfiguration = DiagnosticMonitor.GetDefaultInitialConfiguration();
                 }
 
-                diagnosticMonitorConfiguration.Directories.ScheduledTransferPeriod = TimeSpan.FromMinutes(9.0);
-                roleInstanceDiagnosticManager.SetCurrentConfiguration(diagnosticMonitorConfiguration);
-
                 LogLevel logLevel = (LogLevel)Enum.Parse(typeof(LogLevel), RoleEnvironment.GetConfigurationSettingValue(SCHEDULED_TRANSFER_LOG_LEVEL_FILTER));
                 TimeSpan scheduledTransferPeriod = TimeSpan.FromMinutes(int.Parse(RoleEnvironment.GetConfigurationSettingValue(SCHEDULED_TRANSFER_PERIOD)));
+
+                // Timer is used to schedule file copies to Blob store
+                timer.Interval = scheduledTransferPeriod.TotalMilliseconds;
+                timer.Enabled = true;              
 
                 diagnosticMonitorConfiguration.PerformanceCounters.ScheduledTransferPeriod = scheduledTransferPeriod;
                 diagnosticMonitorConfiguration.WindowsEventLog.ScheduledTransferLogLevelFilter = logLevel;
@@ -179,6 +187,52 @@ namespace WorkerRole
             Tracer.WriteLine("Windows Azure Diagnostics updated", "Information");
 
         }
+
+        private static void OnTimedEvent(object source, ElapsedEventArgs e)
+        {
+            Tracer.WriteLine(string.Format("OnTimedEvent Start {0}", e.SignalTime), "Information");
+
+            try
+            {
+                string[] filePaths = RoleEnvironment.GetConfigurationSettingValue("ScheduledTransferFiles").Split(';');
+
+                if (filePaths.Length > 0)
+                {
+
+                    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
+                        RoleEnvironment.GetConfigurationSettingValue("Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString"));
+                    CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+
+                    CloudBlobContainer blobContainer = blobClient.GetContainerReference("azurerunme-files");
+                    blobContainer.CreateIfNotExist();
+
+                    foreach (string filePath in filePaths)
+                    {
+                        try
+                        {
+                            Tracer.WriteLine(string.Format("Copying {0}", filePath), "Information");
+                            string fileName = Path.GetFileName(filePath);
+                            CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(fileName);
+                            using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                            {
+                                blockBlob.UploadFromStream(fileStream);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Tracer.WriteLine(ex.Message, "Error");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Tracer.WriteLine(ex.Message, "Error");
+            }
+
+            Tracer.WriteLine("OnTimedEvent Completed", "Information");
+        }
+
 
         public void InitialiseTraceConsole(string traceConnectionString)
         {

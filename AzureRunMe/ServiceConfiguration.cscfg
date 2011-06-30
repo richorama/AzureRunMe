@@ -14,6 +14,7 @@
       <Setting name="OnStopCommands" value="stop.bat" />
       <Setting name="DontExit" value="true" />
       <Setting name="DefaultConnectionLimit" value="12" />
+      <Setting name="ScheduledTransferFiles" value="c:\logs\file1.txt;c:\logs\file2.txt"/>
       <Setting name="ScheduledTransferLogLevelFilter" value="Verbose" />
       <Setting name="ScheduledTransferPeriod" value="1" />
       <Setting name="TraceConnectionString" value="ServicePath=trace/$roleinstanceid$;ServiceNamespace=YOURNAMESPACE;IssuerName=YOURISSUERNAME;IssuerSecret=YOURISSUERSECRET" />
