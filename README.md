@@ -1,4 +1,4 @@
-AzureRunMe 1.0.0.17
+AzureRunMe 1.0.0.18
 ===================
 
 Probably the quickest way to get your legacy or third-party code running on Windows Azure.
@@ -15,19 +15,6 @@ From there you can upload your code via ZIP files in Blob Storage and kick off y
 AzureRunMe preconfigures Remote Desktop access, making it easy to debug and diagnose problems.
 
 If you are using Java, Clojure, C++ or other languages this might be the quickest way to get your code running in Azure without having to worry about building any .NET code.
-
-News for v17
-------------
-
-Now supports 7zip (as well as ZIP) for greater compression.
-
-Configuration includes a "Label" to allow you to annotate the configuration and various logs with your own product name and version.
-
-All Starts, Stops and RoleEnvironment changes are now logged to a separate log table in Table Storage to give you a quick indication of operations and SLA.
-
-An *experimental* feature allows you to reload and re run packages and commands without rebooting - just change the UpdateIndicator flag in configuration.
-
-NB The certificate has changed (but you should probably use your own anyway!)
 
 Background
 ----------
@@ -62,9 +49,11 @@ Fast Start
 
 There are three files in the dist directory
 
-AzureRunMe.cspkg - The package file, ready to upload and use
-ServiceConfiguration.cscfg - The configuration file - you'll need to edit this with your various credentials
-AzureRunMe RDP.pfx - A sample certificate that you can use for RDP **
+[AzureRunMe.cspkg](https://github.com/blackwre/AzureRunMe/blob/master/dist/AzureRunMe18.cspkg) - The package file, ready to upload and use.
+
+[ServiceConfiguration.cscfg](https://github.com/blackwre/AzureRunMe/blob/master/dist/ServiceConfiguration18.cscfg) - The configuration file - you'll need to edit this with your various credentials.
+
+[AzureRunMe RDP.pfx](https://github.com/blackwre/AzureRunMe/blob/master/dist/AzureRunMe%20RDP.pfx) - A sample certificate that you can use for RDP **
 
 Upload the certificate (password is tiger123!)
 
@@ -167,6 +156,10 @@ The level of logging and the frequency (in minutes) with which logs are shipped 
 I recommend Cerebrata's [Windows Azure Diagostics Manager](http://www.cerebrata.com/products/AzureDiagnosticsManager/Default.aspx) for viewing
 the output.
 
+You can now copy arbitrary log files (e.g. Tomcat logs) ffrom AzureRunMe to the Blob storage azurerunme-files container using:
+
+		<Setting name="ScheduledTransferFiles" value="c:\logs\file1.txt;c:\logs\file2.txt"/>
+
 Packages
 --------
 
@@ -198,6 +191,10 @@ If you leave Commands blank and set DontExit, like this
 
 Then the instance boots up without running any code, but you can still remote desktop in and start playing.
 
+Optionally you can run some commands when the instance is starting (i.e. via the OnStart method which runs before the load balancer is directing traffic)
+
+	<Setting name="OnStartCommands" value="start.bat" />
+
 Optionally you can run some commands when the instance is stopped (i.e. via the OnStop method)
 
 	<Setting name="OnStopCommands" value="cleanup.bat"/>
@@ -222,7 +219,7 @@ Several of the configuration file settings support expansion of these variables
 * $roleroot$" expands to the role root directory
 * $clouddrive$" expands to the directory where the clouddrive is mounted
 * $approot$ expands to $roleroot$\approot
-* $version$ expands to the AzureRunMe version e.g. 1.0.0 .17
+* $version$ expands to the AzureRunMe version e.g. 1.0.0.18
 
 Advanced Tracing
 ----------------
@@ -355,5 +352,5 @@ See http://www.aws.net/azurelaunchpad or contact info@aws.net if you'd like to h
 
 Rob Blackwell
 
-April 2011
+June 2011
 
