@@ -15,6 +15,7 @@
 //
 #endregion
 
+using System;
 using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace WorkerRole
@@ -22,22 +23,50 @@ namespace WorkerRole
     public class WorkerRole : RoleEntryPoint
     {
         RunMe runMe = new RunMe();
+       
+        private void LogEvent(string eventName, string notes) 
+        {
+            Log log = new Log(RoleEnvironment.GetConfigurationSettingValue("LogConnectionString"));
+            log.WriteEntry(eventName, notes, "");
+        }
 
         public override void Run()
         {
-            runMe.Run();
+            try
+            {
+                runMe.Run();
+            }
+            catch (Exception e)
+            {
+                LogEvent("RunException", e.ToString());
+            }
         }
 
         public override bool OnStart()
         {
-            runMe.OnStart();
-            return base.OnStart();
+            try
+            {
+                runMe.OnStart();
+                return base.OnStart();
+            }
+            catch (Exception e)
+            {
+                LogEvent("OnStartException", e.ToString());
+                return false;
+            }
         }
 
         public override void OnStop()
         {
-            runMe.OnStop();
-            base.OnStop();
+            try
+            {
+                runMe.OnStop();
+                base.OnStop();
+            }
+            catch (Exception e)
+            {
+                LogEvent("OnStopException", e.ToString());
+            }
         }
     }
 }
