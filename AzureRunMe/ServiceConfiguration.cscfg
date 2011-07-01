@@ -7,7 +7,7 @@
       <Setting name="DataConnectionString" value="DefaultEndpointsProtocol=https;AccountName=YOURACCOUNTNAME;AccountKey=YOURACCOUNTKEY" />
       <Setting name="Packages" value="packages/jdk1.6.0_24.zip;packages/apache-tomcat-7.0.12-windows-x64.zip;packages/runme.zip" />
       <Setting name="AlwaysInstallPackages" value="false" />
-      <Setting name="WorkingDirectory" value="c:\" />
+      <Setting name="WorkingDirectory" value="c:\applications\" />
       <Setting name="EnvironmentVariables" value="azurerunme=true;pi=3.14" />
       <Setting name="OnStartCommands" value="start.bat" />
       <Setting name="Commands" value="runme.bat" />
