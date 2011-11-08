@@ -3,7 +3,7 @@ AzureRunMe 1.0.0.19
 
 Probably the quickest way to get your legacy or third-party code running on Windows Azure.
 
-N.B. AzureRunMe has moved to https://github.com/blackwre/AzureRunMe
+N.B. AzureRunMe has moved to https://github.com/RobBlackwell/AzureRunMe
 
 Introduction
 ------------
