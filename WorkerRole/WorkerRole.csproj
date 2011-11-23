@@ -88,17 +88,9 @@
       <HintPath>..\Dlls\Microsoft.ServiceBus.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.CloudDrive, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Diagnostics, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>true</Private>
-    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Diagnostics, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="SevenZipSharp">
       <HintPath>..\Dlls\SevenZipSharp.dll</HintPath>
     </Reference>
