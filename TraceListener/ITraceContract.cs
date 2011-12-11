@@ -1,5 +1,5 @@
 ﻿//---------------------------------------------------------------------------------
-// Microsoft (R) .NET Services
+// Microsoft (R)  Windows Azure AppFabric SDK
 // Software Development Kit
 // 
 // Copyright (c) Microsoft Corporation. All rights reserved.  

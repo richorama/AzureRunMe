@@ -1,5 +1,5 @@
 ﻿//---------------------------------------------------------------------------------
-// Microsoft (R) .NET Services
+// Microsoft (R)  Windows Azure AppFabric SDK
 // Software Development Kit
 // 
 // Copyright (c) Microsoft Corporation. All rights reserved.  
@@ -50,12 +50,11 @@ namespace Microsoft.ServiceBus.Samples
         public void WriteLine(string message, string category)
         {
             //Write to the Console
-            //Console.WriteLine(message,category); // Bug - what if message contains format specifiers!?!
+            // Console.WriteLine(message,category); // Bug - what if message contains format specifiers!?!            
             Console.WriteLine("{0} {1}", category, message);
 
             //Also write to a local Trace Listener
             Trace.WriteLine(message, category);
-
         }
 
         public void Fail(string message)

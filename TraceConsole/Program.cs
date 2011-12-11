@@ -1,5 +1,5 @@
 ﻿//---------------------------------------------------------------------------------
-// Microsoft (R) .NET Services
+// Microsoft (R)  Windows Azure AppFabric SDK
 // Software Development Kit
 // 
 // Copyright (c) Microsoft Corporation. All rights reserved.  
@@ -35,9 +35,7 @@ namespace Microsoft.ServiceBus.Samples
 
             //Create a Behavior for the Credentials
             TransportClientEndpointBehavior sharedSecretServiceBusCredential = new TransportClientEndpointBehavior();
-            sharedSecretServiceBusCredential.CredentialType = TransportClientCredentialType.SharedSecret;
-            sharedSecretServiceBusCredential.Credentials.SharedSecret.IssuerName = issuerName;
-            sharedSecretServiceBusCredential.Credentials.SharedSecret.IssuerSecret = issuerSecret;
+            sharedSecretServiceBusCredential.TokenProvider = TokenProvider.CreateSharedSecretTokenProvider(issuerName, issuerSecret);
 
             //Create the Service Host 
             ServiceHost host = new ServiceHost(typeof(TraceService), uri);

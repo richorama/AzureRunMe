@@ -30,7 +30,15 @@ namespace WorkerRole
         public static string format = Environment.MachineName + ":: {0:u} {1}";
 
         public static void WriteLine(string message, string category) {
-            Trace.WriteLine(string.Format(format,DateTime.Now, message), category);
+            try
+            {
+                Trace.WriteLine(string.Format(format, DateTime.Now, message), category);
+            }
+            catch (Exception)
+            {
+                // Ignore exceptions in Trace Listeners, e.g. if ServiceBus drops out
+            }
+            
         }
 
         public static void WriteLine(object o, string category)

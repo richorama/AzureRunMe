@@ -234,7 +234,7 @@ namespace WorkerRole
         }
 
 
-        public void InitialiseTraceConsole(string traceConnectionString)
+        public CloudTraceListener InitialiseTraceConsole(string traceConnectionString)
         {
 
             // Start a CloudTraceListener so that we can trace from
@@ -263,7 +263,19 @@ namespace WorkerRole
 
             // Trace to service bus
             CloudTraceListener cloudTraceListener = new CloudTraceListener(servicePath, serviceNamespace, issuerName, issuerSecret);
-            Trace.Listeners.Add(cloudTraceListener);
+
+            try
+            {
+                // Make sure it works before using it proper
+                cloudTraceListener.WriteLine("; CloudTraceListener started.");
+                Trace.Listeners.Add(cloudTraceListener);
+            }
+            catch (Exception e)
+            {
+                log.WriteEntry("Exception", e.ToString(), GetLabel());
+            }
+
+            return cloudTraceListener;
         }
 
 
@@ -519,10 +531,12 @@ namespace WorkerRole
 
             approot = Directory.GetCurrentDirectory();
 
-            // If a TraceConnectionString is specified then start a TraceConsole via the AppFabric Service Bus
+            // If a TraceConnectionString is specified then start tracing via the AppFabric Service Bus
             string traceConnectionString = RoleEnvironment.GetConfigurationSettingValue("TraceConnectionString");
             if (!String.IsNullOrEmpty(traceConnectionString))
-                InitialiseTraceConsole(traceConnectionString);
+            {
+                InitialiseTraceConsole(traceConnectionString);   
+            }
 
             ConfigureTraceFormat();
 
