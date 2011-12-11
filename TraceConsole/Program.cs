@@ -24,11 +24,23 @@ namespace Microsoft.ServiceBus.Samples
             Console.WriteLine("CloudTrace Console");
             Console.WriteLine("Connecting ...");
 
-            //Retrieve Settings from App.Config
-            string servicePath = ConfigurationManager.AppSettings["CloudTraceServicePath"];
-            string serviceNamespace = ConfigurationManager.AppSettings["CloudTraceServiceNamespace"];
-            string issuerName = ConfigurationManager.AppSettings["CloudTraceIssuerName"];
-            string issuerSecret = ConfigurationManager.AppSettings["CloudTraceIssuerSecret"];
+            // Retrieve Settings from Environment or App.Config
+
+            string servicePath = Environment.GetEnvironmentVariable("CLOUD_TRACE_SERVICE_PATH");
+            if (servicePath == null)
+                servicePath = ConfigurationManager.AppSettings["CloudTraceServicePath"];
+
+            string serviceNamespace = Environment.GetEnvironmentVariable("CLOUD_TRACE_SERVICE_NAMESPACE");
+            if (serviceNamespace == null)
+                serviceNamespace = ConfigurationManager.AppSettings["CloudTraceServiceNamespace"];
+
+            string issuerName = Environment.GetEnvironmentVariable("CLOUD_TRACE_ISSUER_NAME");
+            if (issuerName == null)
+                issuerName = ConfigurationManager.AppSettings["CloudTraceIssuerName"];
+
+            string issuerSecret = Environment.GetEnvironmentVariable("CLOUD_TRACE_ISSUER_SECRET");
+            if (issuerSecret == null)
+                issuerSecret = ConfigurationManager.AppSettings["CloudTraceIssuerSecret"];
 
             //Construct a Service Bus URI
             Uri uri = ServiceBusEnvironment.CreateServiceUri("sb", serviceNamespace, servicePath);
