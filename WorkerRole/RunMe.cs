@@ -44,7 +44,7 @@ namespace WorkerRole
         List<Process> processes = null;
 
         bool isRoleStopping = false;
-        bool roleIsBusy = true;
+        bool roleIsBusy = false;
 
         string approot;
 
