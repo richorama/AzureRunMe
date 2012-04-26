@@ -1,4 +1,4 @@
-AzureRunMe 1.0.0.19
+AzureRunMe 1.0.0.21
 ===================
 
 Probably the quickest way to get your legacy or third-party code running on Windows Azure.
@@ -27,8 +27,6 @@ All the role information like ipaddress and port could be passed as environment 
 
 I wanted ZIP files to be stored in Blob storage to allow them to be easily updated with all configuration settings in the Azure Service Configuration file.
 
-I wanted real time tracing of stdio, stderr, debug, log4j etc.
-
 AzureRunMe was born, and to my very great suprise, is now being used by a number of commercial organisations, hobbyists and even Microsoft themselves!
 
 Example Scenarios
@@ -44,26 +42,6 @@ Example Scenarios
 * Use PortBridgeAgent to proxy some ports from an intranet server e.g. LDAP.
 * Use PortBridge to proxy internal endpoints back to on premises e.g. JPDA to your Eclipse debugger
 
-Fast Start
-----------
-
-There are three files in the dist directory
-
-[AzureRunMe.cspkg](https://github.com/blackwre/AzureRunMe/blob/master/dist/AzureRunMe18.cspkg) - The package file, ready to upload and use.
-
-[ServiceConfiguration.cscfg](https://github.com/blackwre/AzureRunMe/blob/master/dist/ServiceConfiguration18.cscfg) - The configuration file - you'll need to edit this with your various credentials.
-
-[AzureRunMe RDP.pfx](https://github.com/blackwre/AzureRunMe/blob/master/dist/AzureRunMe%20RDP.pfx) - A sample certificate that you can use for RDP **
-
-Upload the certificate (password is tiger123!)
-
-You can remote desktop by clicking on teh RDP link in the portal - 
-
-user: scott
-password: tiger123!
-
-** NB This certificate is provided for quickstart /demo only - you should use your own for any serious, or
-production work!! You should also change the RDP password ASAP.
 
 Getting Started
 ---------------
@@ -102,8 +80,6 @@ Update DiagnosticsConnectionString with your Windows Azure Storage account detai
 
 Update DataConnectionString with your Windows Azure Storage account details so that AzureRunme can get ZIP files from Blob store. 
 
-Change the TraceConnectionString to your appFabric Service Bus credentials so that you can use the CloudTraceListener to trace your applications.
-
 By default, Packages is set to "packages\jre.zip;packages\dist.zip"  which means download and extract jre.zip then download and extract  dist.zip, before executing runme.bat (Specified as the Command configuration setting.
 
 Click on AzureRunMe and Publish your Azure package. Sign into the [Windows Azure Developer Portal](http://windows.azure.com).
@@ -114,9 +90,7 @@ Change the app.config file for TraceConsole to include your own service bus cred
 
 Right Click, Publish, Configure Remote Desktop Connection.
 
-Run the TraceConsole locally on your desktop machine. Now run the Azure instance by clicking on Run in the Windows Azure Developer Portal.
-
-Deployment might take some time (maybe 10 minutes or more), but after a while you should see trace information start spewing out in your console app. You should see that it's downloading your ZIP files and extracting the, Finally it should run your runme.bat file.
+Deployment might take some time (maybe 10 minutes or more).
 
 If all goes well your app should now be running in the cloud!
 
@@ -127,7 +101,7 @@ Before running your script, the following environment variables are set up
 
 * %IPAddress% to the IP Address of this instance.
 
-All InputEndPoints are setup too, according to the CSDEF, by default this is:
+All InputEndPoints are setup too, according to the CSDEF, something like is:
 
 * %http% the port corresponding to 80
 * %telnet% the port corresponding to 23
@@ -140,8 +114,7 @@ Compiling AzureRunMe
 Prerequisites:
 
 * Visual Studio 2010
-* The Windows Azure SDK v1.5 & Tools for Visual Studio
-* The Windows Azure AppFabric SDK
+* The Windows Azure SDK v1.6
 
 Diagnostics
 -----------
@@ -221,35 +194,6 @@ Several of the configuration file settings support expansion of these variables
 * $approot$ expands to $roleroot$\approot
 * $version$ expands to the AzureRunMe version e.g. 1.0.0.18
 
-Advanced Tracing
-----------------
-
-With a fixed service path of trace/azurerunme, all service bus based tracing from all instances goes to the same TraceConsole.
-
-With multiple instances or multiple deployments that can be confusing - it's hard to see which instance wrote which message when they are interleaved.
-
-For that reason, the service path is configurable with keyword expansions (See above).
-
-The default setting is now trace/$roleinstanceid$ which with single instance deployments becomes trace/WorkerRole_IN_0
-
-so for more advanced deployments, a setting like this might be better:
-
-	<Setting name="TraceConnectionString" value="ServicePath=$deploymentid$/$roleinstanceid$;ServiceNamespace=YOURNAMESPACE;IssuerName=YOURISSUERNAME;IssuerSecret=YOURISSUERSECRET" />
-
-That way you can have separate console listeners attached to different instances at separate endpoints
-
-	sb://YOURNAME.servicebus.windows.net/3bdbf69e94c645f1ab19f2e428eb05fe/WorkerRole_IN_0/
-
-and
-
-	sb://YOURNAME.servicebus.windows.net/3bdbf69e94c645f1ab19f2e428eb05fe/WorkerRole_IN_1/
-
-It's also possible to configure the trace output format similarly
-
-	<Setting name="LogFormat" value="$computername$: {0:u} {1}"/>
-
-Keywords like $computername$ get expanded as above and the rest of the string is as expected by String.Format with field 0 being the message and field 1 being the time.
-
 Cloud Drives
 ------------
 
@@ -326,7 +270,8 @@ The vmsize attribute is unfortunately, baked into the CSDEF file, so specifiying
 
 When you RDP into AzureRunMe and start a web server from, say, a command prompt it may be that you can only see it locally on the VM and not
 via the load balancer. Not yet sure if this is an issue with process context or firewall rules. Currrent work around is that you must start
-your web server withing a runme.bat or similar so that AzureRunMe can start it as part of its Run method.
+your web server within a runme.bat or similar so that AzureRunMe can start it as part of its Run method. UPDATE - I think this is a firewall
+permissions issue - runme.bat runs as a USER, in remote desktop you are an ADMINISTRATOR.
 
 If you specify PreUpdate or PostUpdate commands and these block, then your role might go unhealthy and the fabric might restart your instance.
 
@@ -334,8 +279,6 @@ Credits
 -------
 
 SevenZipSharp http://sevenzipsharp.codeplex.com/ is distributed under the terms of the GNU Lesser General Public License.
-
-TraceConsole and TraceListener are code samples from the Microsoft appFabric SDK (with minor modifications).
 
 Thanks to Jsun for lots of constructive ideas, feature requests and testing.
 
@@ -348,9 +291,10 @@ Commercial Support
 
 This code is now being used for real, on several commercial projects! 
 
-See http://www.two10degrees.com or contact info@aws.net if you'd like to hire us or would like to purchase a formal support contract.
+See http://www.two10degrees.com if you'd like to hire us or would like to purchase a formal support contract. We're also on the look out for Window Azure Developers and Architects.
+
 
 Rob Blackwell
 
-October 2011
+April 2012
 
