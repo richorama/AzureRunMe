@@ -24,7 +24,6 @@ using System.Reflection;
 using System.Threading;
 using System.Timers;
 using System.Xml;
-using Microsoft.ServiceBus.Samples;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.Diagnostics.Management;
@@ -234,50 +233,7 @@ namespace WorkerRole
         }
 
 
-        public CloudTraceListener InitialiseTraceConsole(string traceConnectionString)
-        {
-
-            // Start a CloudTraceListener so that we can trace from
-            // a TraceConsole app running on the desktop
-            string servicePath = "";
-            string serviceNamespace = "";
-            string issuerName = "";
-            string issuerSecret = "";
-
-            string[] traceConnectionSettings = traceConnectionString.Split(';');
-            foreach (string traceConnectionSetting in traceConnectionSettings)
-            {
-                string[] setting = traceConnectionSetting.Split(new char[] { '=' }, 2);
-                if (setting[0] == "ServicePath")
-                    servicePath = setting[1];
-                else if (setting[0] == "ServiceNamespace")
-                    serviceNamespace = setting[1];
-                else if (setting[0] == "IssuerName")
-                    issuerName = setting[1];
-                else if (setting[0] == "IssuerSecret")
-                    issuerSecret = setting[1];
-            }
-
-            // Expand keywords in the service path to allow dynamic configuration based on deploymentid, roleinstance id etc
-            servicePath = ExpandKeywords(servicePath);
-
-            // Trace to service bus
-            CloudTraceListener cloudTraceListener = new CloudTraceListener(servicePath, serviceNamespace, issuerName, issuerSecret);
-
-            try
-            {
-                // Make sure it works before using it proper
-                cloudTraceListener.WriteLine("; CloudTraceListener started.");
-                Trace.Listeners.Add(cloudTraceListener);
-            }
-            catch (Exception e)
-            {
-                log.WriteEntry("Exception", e.ToString(), GetLabel());
-            }
-
-            return cloudTraceListener;
-        }
-
+      
 
 
         /// <summary>
@@ -530,13 +486,6 @@ namespace WorkerRole
             log.WriteEntry("OnStart", "", GetLabel());
 
             approot = Directory.GetCurrentDirectory();
-
-            // If a TraceConnectionString is specified then start tracing via the AppFabric Service Bus
-            string traceConnectionString = RoleEnvironment.GetConfigurationSettingValue("TraceConnectionString");
-            if (!String.IsNullOrEmpty(traceConnectionString))
-            {
-                InitialiseTraceConsole(traceConnectionString);   
-            }
 
             ConfigureTraceFormat();
 

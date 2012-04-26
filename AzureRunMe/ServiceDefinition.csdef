@@ -32,7 +32,6 @@
       <Setting name="ScheduledTransferLogLevelFilter" />
       <Setting name="ScheduledTransferPeriod" />
       <Setting name="ScheduledTransferFiles" />
-      <Setting name="TraceConnectionString" />
       <Setting name="TraceFormat" />
       <Setting name="UpdateIndicator" />
       <Setting name="PreUpdateCommands" />
