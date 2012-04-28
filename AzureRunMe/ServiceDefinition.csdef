@@ -29,9 +29,6 @@
       <Setting name="OnStopCommands" />
       <Setting name="DontExit" />
       <Setting name="DefaultConnectionLimit" />
-      <Setting name="ScheduledTransferLogLevelFilter" />
-      <Setting name="ScheduledTransferPeriod" />
-      <Setting name="ScheduledTransferFiles" />
       <Setting name="TraceFormat" />
       <Setting name="UpdateIndicator" />
       <Setting name="PreUpdateCommands" />

@@ -1,6 +1,6 @@
-﻿#region Copyright (c) 2010 - 2011 Active Web Solutions Ltd
+﻿#region Copyright (c) 2010 - 2012 Active Web Solutions Ltd
 //
-// (C) Copyright 2010 - 2011 Active Web Solutions Ltd
+// (C) Copyright 2010 - 2012 Active Web Solutions Ltd
 //      All rights reserved.
 //
 // This software is provided "as is" without warranty of any kind,
@@ -51,8 +51,6 @@ namespace WorkerRole
 
         // Configuration setting keys
         const string TRACE_FORMAT = "TraceFormat";
-        const string SCHEDULED_TRANSFER_PERIOD = "ScheduledTransferPeriod";
-        const string SCHEDULED_TRANSFER_LOG_LEVEL_FILTER = "ScheduledTransferLogLevelFilter";
         const string DATA_CONNECTION_STRING = "DataConnectionString";
         const string PACKAGES = "Packages";
         const string WORKING_DIRECTORY = "WorkingDirectory";
@@ -94,7 +92,7 @@ namespace WorkerRole
 
                 return xmlDocument.GetElementsByTagName("RoleModel")[0].Attributes["version"].Value;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return "unknown";
             }
@@ -138,53 +136,6 @@ namespace WorkerRole
             Tracer.format = ExpandKeywords(traceFormat);
 
             Tracer.WriteLine(string.Format("Tracer.format = {0}", traceFormat), "Information");
-        }
-
-        private void ConfigureDiagnostics()
-        {
-            Tracer.WriteLine("ConfigureDiagnostics", "Information");
-
-            try
-            {
-                CloudStorageAccount cloudStorageAccount = CloudStorageAccount.Parse(RoleEnvironment.GetConfigurationSettingValue("Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString"));
-
-                RoleInstanceDiagnosticManager roleInstanceDiagnosticManager = cloudStorageAccount.CreateRoleInstanceDiagnosticManager(RoleEnvironment.DeploymentId,
-                    RoleEnvironment.CurrentRoleInstance.Role.Name,
-                    RoleEnvironment.CurrentRoleInstance.Id);
-
-                DiagnosticMonitorConfiguration diagnosticMonitorConfiguration = roleInstanceDiagnosticManager.GetCurrentConfiguration();
-
-                if (diagnosticMonitorConfiguration == null)
-                {
-                    Tracer.WriteLine("There is no CurrentConfiguration for Windows Azure Diagnostics, using DefaultInitialConfiguration", "Information");
-                    diagnosticMonitorConfiguration = DiagnosticMonitor.GetDefaultInitialConfiguration();
-                }
-
-                LogLevel logLevel = (LogLevel)Enum.Parse(typeof(LogLevel), RoleEnvironment.GetConfigurationSettingValue(SCHEDULED_TRANSFER_LOG_LEVEL_FILTER));
-                TimeSpan scheduledTransferPeriod = TimeSpan.FromMinutes(int.Parse(RoleEnvironment.GetConfigurationSettingValue(SCHEDULED_TRANSFER_PERIOD)));
-
-                // Timer is used to schedule file copies to Blob store
-                timer.Interval = scheduledTransferPeriod.TotalMilliseconds;
-                timer.Enabled = true;
-
-                diagnosticMonitorConfiguration.PerformanceCounters.ScheduledTransferPeriod = scheduledTransferPeriod;
-                diagnosticMonitorConfiguration.WindowsEventLog.ScheduledTransferLogLevelFilter = logLevel;
-                diagnosticMonitorConfiguration.WindowsEventLog.ScheduledTransferPeriod = scheduledTransferPeriod;
-                diagnosticMonitorConfiguration.Logs.ScheduledTransferLogLevelFilter = logLevel;
-                diagnosticMonitorConfiguration.Logs.ScheduledTransferPeriod = scheduledTransferPeriod;
-
-                roleInstanceDiagnosticManager.SetCurrentConfiguration(diagnosticMonitorConfiguration);
-
-            }
-            catch (Exception e)
-            {
-                Tracer.WriteLine(e, "Error");
-            }
-
-
-
-            Tracer.WriteLine("Windows Azure Diagnostics updated", "Information");
-
         }
 
         private static void OnTimedEvent(object source, ElapsedEventArgs e)
@@ -231,10 +182,6 @@ namespace WorkerRole
 
             Tracer.WriteLine("OnTimedEvent Completed", "Information");
         }
-
-
-      
-
 
         /// <summary>
         /// Creates a package receipt (a simple text file in the temp directory) 
@@ -333,7 +280,6 @@ namespace WorkerRole
                 Tracer.WriteLine(string.Format("Environment Variable %{0}% already set", variable), "Information");
             }
         }
-
 
         private void MountCloudDrive(string container, string vhdName, int size)
         {
@@ -496,10 +442,8 @@ namespace WorkerRole
             Tracer.WriteLine(string.Format("AzureRunMe {0} on Windows Azure SDK {1}",
                 GetAzureRunMeVersion(), GetWindowsAzureSDKVersion()), "Information");
 
-            Tracer.WriteLine("Copyright (c) 2010 - 2011 Active Web Solutions Ltd [www.aws.net]", "Information");
+            Tracer.WriteLine("Copyright (c) 2010 - 2012 Active Web Solutions Ltd [www.aws.net]", "Information");
             Tracer.WriteLine("", "Information");
-
-            ConfigureDiagnostics();
 
             // For information on handling configuration changes
             // see the MSDN topic at http://go.microsoft.com/fwlink/?LinkId=166357.
@@ -797,7 +741,6 @@ namespace WorkerRole
             Tracer.WriteLine("RoleEnvironmentChanged", "Information");
             log.WriteEntry("RoleEnvironmentChanged", "", GetLabel());
 
-            bool reconfigureDiagnostics = false;
             bool update = false;
             bool remountCloudDrive = false;
 
@@ -819,11 +762,6 @@ namespace WorkerRole
                             ConfigureTraceFormat();
                             break;
 
-                        case SCHEDULED_TRANSFER_LOG_LEVEL_FILTER:
-                        case SCHEDULED_TRANSFER_PERIOD:
-                            reconfigureDiagnostics = true;
-                            break;
-
                         case UPDATE_INDICATOR:
                             update = true;
                             break;
@@ -838,7 +776,6 @@ namespace WorkerRole
                             ConfigureDefaultConnectionLimit();
                             break;
 
-                        // TODO: Support Trace changes
                     }
 
                 }
@@ -859,9 +796,6 @@ namespace WorkerRole
                 UnmountCloudDrive();
                 MountCloudDrive();
             }
-
-            if (reconfigureDiagnostics)
-                ConfigureDiagnostics();
 
             if (update)
                 DoUpdate();

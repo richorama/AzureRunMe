@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Active Web Solutions")]
 [assembly: AssemblyProduct("AzureRunMe")]
-[assembly: AssemblyCopyright("Copyright © Active Web Solutions 2011")]
+[assembly: AssemblyCopyright("Copyright © Active Web Solutions 2010 - 2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
