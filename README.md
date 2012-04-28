@@ -120,18 +120,13 @@ Diagnostics
 -----------
 
 By default, log files, event logs and some performance counters are written to table storage using Windows Azure Diagnostics.
-
-The level of logging and the frequency (in minutes) with which logs are shipped to storage can be changed in the CSCFG file.
-
-		<Setting name="ScheduledTransferLogLevelFilter" value="Verbose"/>
-		<Setting name="ScheduledTransferPeriod" value="1"/>
+This is all controlled from the diagnostics.wadcfg file.
 
 I recommend Cerebrata's [Windows Azure Diagostics Manager](http://www.cerebrata.com/products/AzureDiagnosticsManager/Default.aspx) for viewing
 the output.
 
 You can now copy arbitrary log files (e.g. Tomcat logs) ffrom AzureRunMe to the Blob storage azurerunme-files container using:
 
-		<Setting name="ScheduledTransferFiles" value="c:\logs\file1.txt;c:\logs\file2.txt"/>
 
 Packages
 --------
