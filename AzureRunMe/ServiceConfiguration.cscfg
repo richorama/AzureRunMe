@@ -25,8 +25,14 @@
       <Setting name="LogTableName" value="AzureRunMeLogsTable" />
       <Setting name="LogConnectionString" value="DefaultEndpointsProtocol=https;AccountName=YOURACCOUNTNAME;AccountKey=YOURACCOUNTKEY" />
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=YOURACCOUNTNAME;AccountKey=YOURACCOUNTKEY" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.Enabled" value="true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountUsername" value="rich" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountEncryptedPassword" value="MIIBnQYJKoZIhvcNAQcDoIIBjjCCAYoCAQAxggFOMIIBSgIBADAyMB4xHDAaBgNVBAMME1dpbmRvd3MgQXp1cmUgVG9vbHMCEG1GBU8ZRBWUQ7JHEPNgBKowDQYJKoZIhvcNAQEBBQAEggEAANfR+CUMQV+v0hi+80Lcy2PN+NSHTWg41rjf1HQH5LuxOwfMq6tj1xAaUtn0afPJmdwEINdLHybZLL5SUDxyboaLL7yzfIrT4FaaIBGHxtA5jyiDBWATnymMmt1JXEkrXKd9QJVez7LtgcUNPmtl7suiji7jTWi7IOEoddTiDGUul2u5/mVf6qe7ErLasdvosY+uCQk/1ADmuizzV4EfzTUbHS4iTGkFAJzd/J+FOreMmXIABsrk6Dyw6b3YXRaEFzoszRu1FPjBZhclgUrAFXmZ4p8IMwh9l1FHfCYFUKea5+cQbLVI2FwrYDG1BKR/j6CwRJ7bG7IrufuOI3ZjYzAzBgkqhkiG9w0BBwEwFAYIKoZIhvcNAwcECHBXqWHgnze4gBDqOyj5wq8CIxAdfE9WVCGT" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountExpiration" value="2013-09-11T23:59:59.0000000+01:00" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteForwarder.Enabled" value="true" />
     </ConfigurationSettings>
     <Certificates>
+      <Certificate name="Microsoft.WindowsAzure.Plugins.RemoteAccess.PasswordEncryption" thumbprint="9083A5F893844E2E55BDADA83A195A8EC3CE90DA" thumbprintAlgorithm="sha1" />
     </Certificates>
   </Role>
 </ServiceConfiguration>
