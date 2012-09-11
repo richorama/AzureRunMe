@@ -424,7 +424,7 @@ namespace WorkerRole
 
         public string GetWorkingDirectory()
         {
-            return ExpandKeywords(RoleEnvironment.GetConfigurationSettingValue("WorkingDirectory"));
+            return ExpandKeywords(RoleEnvironment.GetConfigurationSettingValue(WORKING_DIRECTORY));
         }
 
         public bool OnStart()
