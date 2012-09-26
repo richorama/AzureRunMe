@@ -524,7 +524,7 @@ namespace WorkerRole
                             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(RoleEnvironment.GetConfigurationSettingValue(DATA_CONNECTION_STRING));
                             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
                             var container = blobClient.GetContainerReference(containerName);
-                            foreach (var blobListItem in container.ListBlobs())
+                            foreach (var blobListItem in container.ListBlobs().OrderBy(x => x.Uri.ToString()))
                             {
                                 var blob = container.GetBlobReference(blobListItem.Uri.ToString());
                                 InstallPackageIfNewer(alwaysInstallPackages, workingDirectory, containerName, blob.Name);
