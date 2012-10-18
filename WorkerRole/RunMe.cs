@@ -545,12 +545,19 @@ namespace WorkerRole
 
         private void InstallPackageIfNewer(bool alwaysInstallPackages, string workingDirectory, string containerName, string packageName)
         {
-            string packageReceiptFileName = Path.Combine(workingDirectory, packageName + ".receipt");
-
-            if (alwaysInstallPackages || IsNewPackage(containerName, packageName, packageReceiptFileName))
+            try
             {
-                InstallPackage(containerName, packageName, workingDirectory);
-                WritePackageReceipt(packageReceiptFileName);
+                string packageReceiptFileName = Path.Combine(workingDirectory, packageName + ".receipt");
+
+                if (alwaysInstallPackages || IsNewPackage(containerName, packageName, packageReceiptFileName))
+                {
+                    InstallPackage(containerName, packageName, workingDirectory);
+                    WritePackageReceipt(packageReceiptFileName);
+                }
+            }
+            catch (Exception e)
+            {
+                Tracer.WriteLine(string.Format("Package \"{0}\" failed to install, {1}", packageName, e), "Information");
             }
         }
 
