@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("AzureRunMe")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Windows Azure BootStrap Program")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Active Web Solutions")]
+[assembly: AssemblyCompany("Two10degrees Ltd.")]
 [assembly: AssemblyProduct("AzureRunMe")]
-[assembly: AssemblyCopyright("Copyright © Active Web Solutions 2010 - 2012")]
+[assembly: AssemblyCopyright("Copyright © Two10degrees Ltd 2010 - 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("54dce10b-d6e6-4f21-a987-dad9c28150d1")]
+[assembly: Guid("de8ff016-ebbc-43e5-9778-e52f81ee7574")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.21.*")]
-[assembly: AssemblyFileVersion("1.0.21")]
+[assembly: AssemblyVersion("1.0.0.22")]
+[assembly: AssemblyFileVersion("1.0.0.22")]

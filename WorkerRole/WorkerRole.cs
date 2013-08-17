@@ -1,30 +1,38 @@
-﻿#region Copyright (c) 2010 - 2012 Active Web Solutions Ltd
+#region Copyright (c) 2010 - 2013 Two10degrees Ltd
 //
-// (C) Copyright 2010 - 2012 Active Web Solutions Ltd
+// (C) Copyright 2010 - 2013 Two10degrees Ltd
 //      All rights reserved.
 //
 // This software is provided "as is" without warranty of any kind,
 // express or implied, including but not limited to warranties as to
-// quality and fitness for a particular purpose. Active Web Solutions Ltd
+// quality and fitness for a particular purpose. Two10degrees Ltd
 // does not support the Software, nor does it warrant that the Software
 // will meet your requirements or that the operation of the Software will
 // be uninterrupted or error free or that any defects will be
 // corrected. Nothing in this statement is intended to limit or exclude
 // any liability for personal injury or death caused by the negligence of
-// Active Web Solutions Ltd, its employees, contractors or agents.
+// Two10degrees Ltd, its employees, contractors or agents.
 //
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.ServiceRuntime;
+using Microsoft.WindowsAzure.Storage;
 
 namespace WorkerRole
 {
     public class WorkerRole : RoleEntryPoint
     {
         RunMe runMe = new RunMe();
-       
-        private void LogEvent(string eventName, string notes) 
+
+        private void LogEvent(string eventName, string notes)
         {
             Log log = new Log(RoleEnvironment.GetConfigurationSettingValue("LogConnectionString"));
             log.WriteEntry(eventName, notes, "");

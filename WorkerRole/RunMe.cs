@@ -1,17 +1,17 @@
-﻿#region Copyright (c) 2010 - 2012 Active Web Solutions Ltd
+﻿#region Copyright (c) 2010 - 2013 Two10degrees Ltd
 //
-// (C) Copyright 2010 - 2012 Active Web Solutions Ltd
+// (C) Copyright 2010 - 2013 Two10degrees Ltd
 //      All rights reserved.
 //
 // This software is provided "as is" without warranty of any kind,
 // express or implied, including but not limited to warranties as to
-// quality and fitness for a particular purpose. Active Web Solutions Ltd
+// quality and fitness for a particular purpose. Two10degrees Ltd
 // does not support the Software, nor does it warrant that the Software
 // will meet your requirements or that the operation of the Software will
 // be uninterrupted or error free or that any defects will be
 // corrected. Nothing in this statement is intended to limit or exclude
 // any liability for personal injury or death caused by the negligence of
-// Active Web Solutions Ltd, its employees, contractors or agents.
+// Two10degrees Ltd, its employees, contractors or agents.
 //
 #endregion
 
@@ -29,8 +29,11 @@ using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.Diagnostics.Management;
 using Microsoft.WindowsAzure.ServiceRuntime;
-using Microsoft.WindowsAzure.StorageClient;
+using Microsoft.WindowsAzure.Storage;
 using SevenZip;
+using Microsoft.WindowsAzure.StorageClient;
+using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.WindowsAzure.Storage.RetryPolicies;
 
 
 namespace WorkerRole
@@ -155,7 +158,7 @@ namespace WorkerRole
                     CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
                     CloudBlobContainer blobContainer = blobClient.GetContainerReference("azurerunme-files");
-                    blobContainer.CreateIfNotExist();
+                    blobContainer.CreateIfNotExists();
 
                     foreach (string filePath in filePaths)
                     {
@@ -207,14 +210,14 @@ namespace WorkerRole
 
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
-            blobClient.RetryPolicy = RetryPolicies.Retry(100, TimeSpan.FromSeconds(1));
-            blobClient.Timeout = TimeSpan.FromSeconds(600);
+            blobClient.RetryPolicy = new LinearRetry(TimeSpan.FromSeconds(2), 10);
 
             CloudBlobContainer container = blobClient.GetContainerReference(containerName);
             CloudBlockBlob blob = container.GetBlockBlobReference(packageName);
 
             blob.FetchAttributes();
-            DateTime blobTimeStamp = blob.Attributes.Properties.LastModifiedUtc;
+
+            var blobTimeStamp = blob.Properties.LastModified;
 
             DateTime fileTimeStamp = File.GetCreationTimeUtc(packageReceiptFile);
 
@@ -243,8 +246,7 @@ namespace WorkerRole
 
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
-            blobClient.RetryPolicy = RetryPolicies.Retry(100, TimeSpan.FromSeconds(1));
-            blobClient.Timeout = TimeSpan.FromSeconds(600);
+            blobClient.RetryPolicy = new LinearRetry(TimeSpan.FromSeconds(2), 10);
 
             CloudBlobContainer container = blobClient.GetContainerReference(containerName);
             CloudBlockBlob blob = container.GetBlockBlobReference(packageName);
@@ -280,72 +282,6 @@ namespace WorkerRole
             {
                 Tracer.WriteLine(string.Format("Environment Variable %{0}% already set", variable), "Information");
             }
-        }
-
-        private void MountCloudDrive(string container, string vhdName, int size)
-        {
-            Tracer.WriteLine("Configuring CloudDrive", "Information");
-
-            LocalResource localCache = RoleEnvironment.GetLocalResource("MyAzureDriveCache");
-
-            const int TRIES = 30;
-
-            // Temporary workaround for ERROR_UNSUPPORTED_OS seen with Windows Azure Drives
-            // See http://blogs.msdn.com/b/windowsazurestorage/archive/2010/12/17/error-unsupported-os-seen-with-windows-azure-drives.aspx
-            for (int i = 0; i < TRIES; i++)
-            {
-                try
-                {
-                    CloudDrive.InitializeCache(localCache.RootPath, localCache.MaximumSizeInMegabytes);
-                    break;
-                }
-                catch (CloudDriveException ex)
-                {
-                    if (!ex.Message.Equals("ERROR_UNSUPPORTED_OS"))
-                    {
-                        throw;
-                    }
-
-                    if (i >= (TRIES - 1))
-                    {
-                        // If the workaround fails then it would be dangerous to continue silently, so exit 
-                        Tracer.WriteLine("Workaround for ERROR_UNSUPPORTED_OS see http://bit.ly/fw7qzo FAILED", "Error");
-                        System.Environment.Exit(-1);
-                    }
-
-                    Tracer.WriteLine("Using temporary workaround for ERROR_UNSUPPORTED_OS see http://bit.ly/fw7qzo", "Information");
-                    Thread.Sleep(10000);
-                }
-            }
-
-            CloudStorageAccount cloudDriveStorageAccount = CloudStorageAccount.Parse(RoleEnvironment.GetConfigurationSettingValue(CLOUD_DRIVE_CONNECTION_STRING));
-            CloudBlobClient blobClient = cloudDriveStorageAccount.CreateCloudBlobClient();
-            blobClient.GetContainerReference(container).CreateIfNotExist();
-
-            CloudPageBlob pageBlob = blobClient
-                .GetContainerReference(container)
-                .GetPageBlobReference(vhdName);
-
-            cloudDrive = cloudDriveStorageAccount.CreateCloudDrive(pageBlob.Uri.ToString());
-
-            try
-            {
-                if (!pageBlob.Exists())
-                {
-                    Tracer.WriteLine(string.Format("Creating page blob {0}", cloudDrive.Uri), "Information");
-                    cloudDrive.Create(size);
-                }
-
-                Tracer.WriteLine(string.Format("Mounting {0}", cloudDrive.Uri), "Information");
-                cloudDrive.Mount(25, DriveMountOptions.Force);
-            }
-            catch (CloudDriveException e)
-            {
-                Tracer.WriteLine(e, "Error");
-            }
-
-            Tracer.WriteLine(string.Format("CloudDrive {0} mounted at {1}", cloudDrive.Uri, cloudDrive.LocalPath), "Information");
-
         }
 
         /// <summary>
@@ -443,7 +379,7 @@ namespace WorkerRole
             Tracer.WriteLine(string.Format("AzureRunMe {0} on Windows Azure SDK {1}",
                 GetAzureRunMeVersion(), GetWindowsAzureSDKVersion()), "Information");
 
-            Tracer.WriteLine("Copyright (c) 2010 - 2012 Active Web Solutions Ltd [www.aws.net]", "Information");
+            Tracer.WriteLine("Copyright (c) 2010 - 2013 Two10degrees Ltd [www.aws.net]", "Information");
             Tracer.WriteLine("", "Information");
 
             // For information on handling configuration changes
@@ -463,15 +399,6 @@ namespace WorkerRole
             Tracer.WriteLine(string.Format("MachineName: {0}", Environment.MachineName), "Information");
             Tracer.WriteLine(string.Format("ProcessorCount: {0}", Environment.ProcessorCount), "Information");
             Tracer.WriteLine(string.Format("Time: {0}", DateTime.Now), "Information");
-
-            try
-            {
-                MountCloudDrive();
-            }
-            catch (Exception e)
-            {
-                Tracer.WriteLine(e, "Error");
-            }
 
             try
             {
@@ -526,7 +453,7 @@ namespace WorkerRole
                             var container = blobClient.GetContainerReference(containerName);
                             foreach (var blobListItem in container.ListBlobs().OrderBy(x => x.Uri.ToString()))
                             {
-                                var blob = container.GetBlobReference(blobListItem.Uri.ToString());
+                                var blob = container.GetBlobReferenceFromServer(blobListItem.Uri.ToString());
                                 InstallPackageIfNewer(alwaysInstallPackages, workingDirectory, containerName, blob.Name);
                             }
                         }
@@ -558,20 +485,6 @@ namespace WorkerRole
             catch (Exception e)
             {
                 Tracer.WriteLine(string.Format("Package \"{0}\" failed to install, {1}", packageName, e), "Information");
-            }
-        }
-
-
-        private void MountCloudDrive()
-        {
-            // If specified, mount a cloud drive
-            string cloudDrive = RoleEnvironment.GetConfigurationSettingValue(CLOUD_DRIVE);
-            if (cloudDrive != "")
-            {
-                int cloudDriveSize = Int32.Parse(RoleEnvironment.GetConfigurationSettingValue(CLOUD_DRIVE_SIZE));
-                cloudDrive = ExpandKeywords(cloudDrive);
-                string[] parts = cloudDrive.Split('\\');
-                MountCloudDrive(parts[0], parts[1], cloudDriveSize);
             }
         }
 
@@ -768,7 +681,6 @@ namespace WorkerRole
             log.WriteEntry("RoleEnvironmentChanged", "", GetLabel());
 
             bool update = false;
-            bool remountCloudDrive = false;
 
             foreach (RoleEnvironmentChange roleEnvironmentChange in e.Changes)
             {
@@ -792,12 +704,6 @@ namespace WorkerRole
                             update = true;
                             break;
 
-                        case CLOUD_DRIVE_CONNECTION_STRING:
-                        case CLOUD_DRIVE:
-                        case CLOUD_DRIVE_SIZE:
-                            remountCloudDrive = true;
-                            break;
-
                         case DEFAULT_CONNECTION_LIMIT:
                             ConfigureDefaultConnectionLimit();
                             break;
@@ -815,12 +721,6 @@ namespace WorkerRole
                     Tracer.WriteLine("UnknownRoleEnvironmentChange", "Information");
                     log.WriteEntry("UnknownRoleEnvironmentChange", roleEnvironmentChange.GetType().ToString(), GetLabel());
                 }
-            }
-
-            if (remountCloudDrive)
-            {
-                UnmountCloudDrive();
-                MountCloudDrive();
             }
 
             if (update)
