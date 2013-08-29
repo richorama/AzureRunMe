@@ -1,4 +1,4 @@
-# AzureRunMe 1.0.0.22
+# AzureRunMe 1.0.0.23
 
 Probably the quickest way to get your legacy or third-party code
 running on Windows Azure.
@@ -211,8 +211,6 @@ Several of the configuration file settings support expansion of these variables
 * $guid$ expands to a new Globally Unique Identifier
 * $now$ expands to DateTime.Now (the current time).
 * $roleroot$" expands to the role root directory
-* $clouddrive$" expands to the directory where the clouddrive is
-  mounted
 * $approot$ expands to $roleroot$\approot
 * $version$ expands to the AzureRunMe version e.g. 1.0.0.18
 
