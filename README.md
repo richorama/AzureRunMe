@@ -1,4 +1,4 @@
-# AzureRunMe 1.0.0.23
+# AzureRunMe 1.0.0.24
 
 Probably the quickest way to get your legacy or third-party code
 running on Windows Azure.
@@ -132,8 +132,8 @@ like is:
 
 Prerequisites:
 
-* Visual Studio 2012
-* The Windows Azure SDK for .NET (V2012)-2.1
+* Visual Studio 2012/2013
+* The Windows Azure SDK for .NET version 2.2
 
 ## Diagnostics
 
@@ -216,7 +216,7 @@ Several of the configuration file settings support expansion of these variables
 
 ## Cloud Drives
 
-Used to be supported but now removed as of 20130817
+Used to be supported but now removed as of 17/08/2013
 
 ## DontExit
 
@@ -314,5 +314,5 @@ to purchase a formal support contract. We're also on the look out for
 Window Azure Developers and Architects.
 
 Rob Blackwell    
-August 2013
+October 2013
 
